@@ -85,28 +85,28 @@ function saveArticle(App $app):void{
 function renderPage(string $title, string $body, string $wordCount): void {
 	echo
 	"<body>
-		<div id='header' class='header'>
+		<header id='header' class='header'>
 		<a href='/'>Article editor</a><div> $wordCount </div>
-		</div>
+		</header>
 		<div class='page'>
-		<div class='main'>
-			<h2>Create/Edit Article</h2>
-			<p>Create a new article by filling out the fields below. Edit an article by typing the beginning of the title in the title field, selecting the title from the auto-complete list, and changing the text in the textfield.</p>
-			<form action='index.php' method='post'>
-			<input name='title' type='text' placeholder='Article title...' value='$title'>
-			<br />
-			<textarea name='body' placeholder='Article body...'>$body</textarea>
-			<br />
-			<button type='submit' class='submit-button'>Submit</button>
-			</form>
-			<h2>Preview</h2>
-			<div> $title</div>
-			<div> $body</div>
-			<h2>Articles</h2>
-			<ul>
-				<li><a href='index.php?title=Foo'>Foo</a></li>
-			</ul>
-		</div>
+			<main class='main'>
+				<h2>Create/Edit Article</h2>
+				<p>Create a new article by filling out the fields below. Edit an article by typing the beginning of the title in the title field, selecting the title from the auto-complete list, and changing the text in the textfield.</p>
+				<form action='index.php' method='post'>
+				<input name='title' type='text' placeholder='Article title...' value='$title'>
+				<br />
+				<textarea name='body' placeholder='Article body...'>$body</textarea>
+				<br />
+				<button type='submit' class='submit-button'>Submit</button>
+				</form>
+				<h2>Preview</h2>
+				<div> $title</div>
+				<div> $body</div>
+				<h2>Articles</h2>
+				<ul>
+					<li><a href='index.php?title=Foo'>Foo</a></li>
+				</ul>
+			</main>
 		</div>
 	</body>";
 }
