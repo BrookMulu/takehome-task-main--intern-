@@ -49,11 +49,90 @@
     }
 
     /**
-     * Waits for the page to load and then enables the form submission.
+     * Initializes the autocomplete functionality for the title input field.
      */
-    function initialize() {
-        setTimeout(enableFormSubmission, 1500);
+    function initializeAutocomplete() {
+        const titleInput = document.querySelector('input[name="title"]');
+        const autocompleteList = document.createElement('ul');
+        autocompleteList.classList.add('autocomplete-list');
+        titleInput.parentNode.appendChild(autocompleteList);
+
+        let debounceTimeout;
+
+        /**
+         * Fetch suggestions from the server based on user input.
+         * @param {string} query - The user's input value.
+         * @return {Promise<Array<string>>} - Array of suggestions from the server.
+         */
+        async function fetchSuggestions(query) {
+            try {
+                const response = await fetch(`api.php?prefixsearch=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Error fetching suggestions.');
+                const data = await response.json();
+                return data.content || [];
+            } catch (error) {
+                console.error('Autocomplete API error:', error);
+                return [];
+            }
+        }
+
+        /**
+         * Renders the suggestions list under the title input.
+         * @param {Array<string>} suggestions - List of suggestions from the server.
+         */
+        function renderSuggestions(suggestions) {
+            autocompleteList.innerHTML = ''; 
+
+            if (suggestions.length === 0) {
+                autocompleteList.style.display = 'none';
+                return;
+            }
+
+            suggestions.forEach((suggestion) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = suggestion;
+                listItem.addEventListener('click', () => {
+                    titleInput.value = suggestion;
+                    autocompleteList.style.display = 'none';
+                });
+                autocompleteList.appendChild(listItem);
+            });
+
+            autocompleteList.style.display = 'block';
+        }
+
+        /**
+         * Handles user input with debounce to limit server requests.
+         * @param {Event} event - Input event triggered by typing in the title field.
+         */
+        function handleInput(event) {
+            const query = event.target.value.trim();
+
+            if (!query) {
+                autocompleteList.style.display = 'none';
+                return;
+            }
+
+            clearTimeout(debounceTimeout);
+
+            debounceTimeout = setTimeout(async () => {
+                const suggestions = await fetchSuggestions(query);
+                renderSuggestions(suggestions);
+            }, 200); 
+        }
+
+        titleInput.addEventListener('input', handleInput);
     }
 
-	initialize()
-}() )
+    /**
+     * Waits for the page to load and then enables all functionality.
+     */
+    function initialize() {
+        setTimeout(() => {
+            enableFormSubmission();
+            initializeAutocomplete();
+        }, 1500);
+    }
+	
+    initialize();
+})();
