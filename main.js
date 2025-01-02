@@ -30,17 +30,30 @@
 	// to the user when API requests fail and provide a graceful degradation of
 	// functionality.
 
-	function getFormButtonToWork() {
-		const submitButton = document.querySelector( '.submit-button' );
-		const form = document.querySelector( 'form' );
+	/**
+     * Attaches a click event to the submit button to submit the form.
+     */
+    function enableFormSubmission() {
+        const submitButton = document.querySelector('.submit-button');
+        const form = document.querySelector('form');
 
-		// Make form submit button work when submit is clicked.
-		submitButton.addEventListener( 'click', (e) => {
-			e.preventDefault();
-			form.submit();
-		} );
-	}
+        if (!submitButton || !form) {
+            console.warn('Submit button or form not found.');
+            return;
+        }
 
-	// Waiting for page to load which takes about 1.5 seconds on my machine.
-	setTimeout( getFormButtonToWork, 1500);
+        submitButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            form.submit();
+        });
+    }
+
+    /**
+     * Waits for the page to load and then enables the form submission.
+     */
+    function initialize() {
+        setTimeout(enableFormSubmission, 1500);
+    }
+
+	initialize()
 }() )
