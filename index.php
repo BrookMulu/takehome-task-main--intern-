@@ -17,6 +17,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $app = new App();
 
+// Content Security Policy (CSP) to enhance security:
+
+header("Content-Security-Policy: default-src 'self'; style-src 'self' http://design.wikimedia.org; script-src 'self';");
+
+
 /**
  * The HTML <head> section outputs the necessary stylesheets and scripts.
  */
@@ -33,17 +38,23 @@ function renderHead(){
  * @param App $app instance fof application to fetch articles.
  * @return array an array that contains the title and body of the article.
  */
-function fetchArticleContent(App $app):array{
+function fetchArticleContent(App $app): array {
 	$title = '';
 	$body = '';
-	if ( isset( $_GET['title'] ) ) {
-		//changed htmlentities to htmlspecialchars due to xss vulnerability
-		$title = htmlspecialchars( $_GET['title'] );
-		$body = $app->fetch( $_GET );
-		$body = file_get_contents( sprintf( 'articles/%s', $title ) );
+	if (isset($_GET['title'])) {
+	//Validating and sanitizing title input
+		$title = htmlspecialchars(basename($_GET['title']), ENT_QUOTES, 'UTF-8');
+		$filePath = sprintf('articles/%s.txt', $title);
+		if (file_exists($filePath)) {
+			$body = htmlspecialchars(file_get_contents($filePath), ENT_QUOTES, 'UTF-8');
+		} 
+		else {
+			die("Article not found.");
+		}
 	}
 	return ['title' => $title, 'body' => $body];
 }
+	
 
 /**
  * fetches count of all words in the article's directory.
@@ -86,22 +97,22 @@ function renderPage(string $title, string $body, string $wordCount): void {
 	echo
 	"<body>
 		<header id='header' class='header'>
-		<a href='/'>Article editor</a><div> $wordCount </div>
+		<a href='/'>Article editor</a><div>" . htmlspecialchars($wordCount, ENT_QUOTES, 'UTF-8') . "</div>
 		</header>
 		<div class='page'>
 			<main class='main'>
 				<h2>Create/Edit Article</h2>
 				<p>Create a new article by filling out the fields below. Edit an article by typing the beginning of the title in the title field, selecting the title from the auto-complete list, and changing the text in the textfield.</p>
 				<form action='index.php' method='post'>
-				<input name='title' type='text' placeholder='Article title...' value='$title'>
+				<input name='title' type='text' placeholder='Article title...' value='" . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . "'>
 				<br />
-				<textarea name='body' placeholder='Article body...'>$body</textarea>
+				<textarea name='body' placeholder='Article body...'>" . htmlspecialchars($body, ENT_QUOTES, 'UTF-8') . "</textarea>
 				<br />
 				<button type='submit' class='submit-button'>Submit</button>
 				</form>
 				<h2>Preview</h2>
-				<div> $title</div>
-				<div> $body</div>
+				<div>" . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . "</div>
+				<div>" . htmlspecialchars($body, ENT_QUOTES, 'UTF-8') . "</div>
 				<h2>Articles</h2>
 				<ul>
 					<li><a href='index.php?title=Foo'>Foo</a></li>
