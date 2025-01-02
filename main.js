@@ -133,6 +133,21 @@
             initializeAutocomplete();
         }, 1500);
     }
-	
+
     initialize();
 })();
+
+/**
+ * If I had more time for the remaining todo's:
+ * TODO B: I would have made the dropdown selection, at the moment the autosuggestion is on
+ * the preview which I was using for to make it easier to figure out how to implement auto suggestions.
+ * TODO C: I would have modified the listItem.addEventListener to fetch article contents,
+ * I also would have implemetented a async fetcharticlecontents funtion tp request for the article 
+ * contents. I would have also update the click event listener in render suggestions to call the 
+ * fetcharticlecontents function.
+ * TODO D: I would have added a onFocus event listener for the tile input which will trigger the 
+ * visibility of the dropdown, and blur to implement hiding the autocomplete list and finally a 
+ * click event on the document to check if the click is outside the dropdown
+ * TODO F: I would have added a displayError(message) function to diplay the user errors and 
+ * catch errors in teh fetch suggestions and fetch article content methods.
+*/
