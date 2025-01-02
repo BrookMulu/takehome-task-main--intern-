@@ -93,34 +93,62 @@ function saveArticle(App $app):void{
 * @param string $wordCount The word count of all articles.
 */
 
-function renderPage(string $title, string $body, string $wordCount): void {
-	echo
-	"<body>
-		<header id='header' class='header'>
-		<a href='/'>Article editor</a><div>" . htmlspecialchars($wordCount, ENT_QUOTES, 'UTF-8') . "</div>
-		</header>
-		<div class='page'>
-			<main class='main'>
-				<h2>Create/Edit Article</h2>
-				<p>Create a new article by filling out the fields below. Edit an article by typing the beginning of the title in the title field, selecting the title from the auto-complete list, and changing the text in the textfield.</p>
-				<form action='index.php' method='post'>
-				<input name='title' type='text' placeholder='Article title...' value='" . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . "'>
-				<br />
-				<textarea name='body' placeholder='Article body...'>" . htmlspecialchars($body, ENT_QUOTES, 'UTF-8') . "</textarea>
-				<br />
-				<button type='submit' class='submit-button'>Submit</button>
-				</form>
-				<h2>Preview</h2>
-				<div>" . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . "</div>
-				<div>" . htmlspecialchars($body, ENT_QUOTES, 'UTF-8') . "</div>
-				<h2>Articles</h2>
-				<ul>
-					<li><a href='index.php?title=Foo'>Foo</a></li>
-				</ul>
-			</main>
-		</div>
-	</body>";
+/**
+ * getsa list of all the articles
+ * @return array an array of all articles
+ */
+function getArticleList(): array {
+    $articlesPath = 'articles/';
+    $articles = [];
+
+    if (is_dir($articlesPath)) {
+        $dir = new DirectoryIterator($articlesPath);
+        foreach ($dir as $fileinfo) {
+            if ($fileinfo->isDot() || !$fileinfo->isFile()) {
+                continue;
+            }
+            $articles[] = htmlspecialchars($fileinfo->getFilename(), ENT_QUOTES, 'UTF-8');
+        }
+    }
+
+    return $articles;
 }
+
+
+function renderPage(string $title, string $body, string $wordCount): void {
+    // Dynamically get the list of articles
+    $articles = getArticleList();
+    echo
+    "<body>
+        <header id='header' class='header'>
+            <a href='/'>Article editor</a><div>" . htmlspecialchars($wordCount, ENT_QUOTES, 'UTF-8') . "</div>
+        </header>
+        <div class='page'>
+            <main class='main'>
+                <h2>Create/Edit Article</h2>
+                <p>Create a new article by filling out the fields below. Edit an article by typing the beginning of the title in the title field, selecting the title from the auto-complete list, and changing the text in the textfield.</p>
+                <form action='index.php' method='post'>
+                    <input name='title' type='text' placeholder='Article title...' value='" . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . "'>
+                    <br />
+                    <textarea name='body' placeholder='Article body...'>" . htmlspecialchars($body, ENT_QUOTES, 'UTF-8') . "</textarea>
+                    <br />
+                    <button type='submit' class='submit-button'>Submit</button>
+                </form>
+                <h2>Preview</h2>
+                <div>" . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . "</div>
+                <div>" . htmlspecialchars($body, ENT_QUOTES, 'UTF-8') . "</div>
+                <h2>Articles</h2>
+                <ul>";
+				foreach ($articles as $article) {
+					$safeTitle = htmlspecialchars(basename($article, '.txt'), ENT_QUOTES, 'UTF-8');
+					echo "<li><a href='index.php?title=" . urlencode($safeTitle) . "'>$safeTitle</a></li>";
+				}
+    			echo "</ul>
+            </main>
+        </div>
+    </body>";
+}
+
 
 // Main Execution
 renderHead();
